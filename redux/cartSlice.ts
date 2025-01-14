@@ -1,53 +1,73 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CartItem {
-  id: string;
+  id: number;
+  title: string;
+  description: string;
   price: number;
-  quantity: number;
+  category:string;
+  quantity:number
 }
-
+export interface Product {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  rating: number;
+  category: string;
+  image: string;
+  __v: number;
+}
 interface CartState {
   items: CartItem[];
-  totalPrice: number;
-  loading: boolean;
-  error: string | null;
+  // totalPrice: number;
 }
 
-const CartSlice = createSlice({
+const initialState: CartState = {
+  items:[]
+  // totalPrice: 0,
+};
+
+const updateLocalStorage = (items: CartItem[]) => {
+  localStorage.setItem('cartItems', JSON.stringify(items));
+};
+
+export const cartSlice = createSlice({
   name: 'cart',
-  initialState: {
-    items: [] as CartItem[],
-    totalPrice: 0,
-  } as CartState,
+  initialState,
   reducers: {
-    addItemToCart: (state, action) => {
-      const item = action.payload;
+    addItemToCart: (state, action: PayloadAction<{ item: Product; quantity: number }>) => {
+      const { item, quantity } = action.payload;
       const existingItem = state.items.find((i) => i.id === item.id);
       if (existingItem) {
-        existingItem.quantity += 1;
+        existingItem.quantity += quantity;
       } else {
-        state.items.push({ ...item, quantity: 1 });
+        state.items.push({ ...item, quantity });
       }
-      state.totalPrice += item.price;
+      updateLocalStorage(state.items)
     },
-    removeItemFromCart: (state, action) => {
-      const itemId = action.payload;
+    removeItemFromCart: (state, action: PayloadAction<string>) => {
+      const itemId = parseInt(action.payload);
       const existingItem = state.items.find((i) => i.id === itemId);
       if (existingItem) {
-        state.totalPrice -= existingItem.price * existingItem.quantity;
         state.items = state.items.filter((i) => i.id !== itemId);
       }
+      updateLocalStorage(state.items)
     },
-    updateItemQuantity: (state, action) => {
+    updateItemQuantity: (state, action: PayloadAction<{ itemId: string; quantity: number }>) => {
       const { itemId, quantity } = action.payload;
-      const existingItem = state.items.find((i) => i.id === itemId);
+      const itemIdNumber=parseInt(itemId)
+      const existingItem = state.items.find((i) => i.id === itemIdNumber);
       if (existingItem) {
-        state.totalPrice += (quantity - existingItem.quantity) * existingItem.price;
         existingItem.quantity = quantity;
       }
+      updateLocalStorage(state.items)
+    },
+    setCartItems: (state, action: PayloadAction<CartItem[]>) => {
+      state.items = action.payload;
     },
   },
 });
 
-export const { addItemToCart, removeItemFromCart, updateItemQuantity } = CartSlice.actions;
-export default CartSlice.reducer;
+export const { addItemToCart, removeItemFromCart, updateItemQuantity,setCartItems } = cartSlice.actions;
+export default cartSlice.reducer;

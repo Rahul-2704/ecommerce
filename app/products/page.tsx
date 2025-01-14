@@ -1,10 +1,8 @@
-import ProductComponent from '@/components/product'
-import StoreProvider from '@/redux/store/storeProvider'
+import Product from '@/components/product'
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 
-
-
-export interface Product {
+interface Product {
     id: number
     title: string
     description: string
@@ -21,10 +19,9 @@ export default async function Products() {
     const data=await response.json()
     const products=data.products
     return(
-     
-            <ProductComponent initialProducts={products}/>   
-
-        
+      <Suspense fallback={<div>Loading...</div>}>
+            <Product initialProducts={products}/> 
+      </Suspense>          
     )
 }
 

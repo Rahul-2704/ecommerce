@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import Cart from './cart';
-import StoreProvider from '@/redux/store/storeProvider';
+
 const Navbar = () => {
   return (
     <nav className="bg-gray-800 p-4">
@@ -9,8 +8,8 @@ const Navbar = () => {
         <h1 className="text-white text-2xl">Website</h1>
         <div className="flex space-x-4 items-center">
             <Cart/>
-          <Link href="">
-            <p>Login</p>
+          <Link href="/" className='border border-transparent hover:border-white rounded-full px-2 items-center'>
+            <p className='text-bold text-white'>Login</p>
           </Link>
         </div>
       </div>
